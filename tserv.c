@@ -3,6 +3,15 @@
 #include "logger/tserv.h"
 
 extern int serial_port, file_port;
+extern struct termios tty_opts_backup, tty_opts_raw;
+extern bool raw_set2;
+
+const char cmd_text[][32] = {
+	" ",
+	" AC Charger ON",
+	" AC Charger OFF",
+	" System Data",
+};
 
 char get_one_char(void)
 {
@@ -15,6 +24,7 @@ char get_one_char(void)
 
 	// Back up current TTY settings
 	tcgetattr(STDIN_FILENO, &tty_opts_backup);
+	raw_set2 = true; // restore on signal exit
 
 	// Change TTY settings to raw mode
 	cfmakeraw(&tty_opts_raw);
@@ -28,6 +38,7 @@ char get_one_char(void)
 	read(STDIN_FILENO, &c, 1);
 
 	// Restore previous TTY settings
+	raw_set2 = false;
 	tcsetattr(STDIN_FILENO, TCSANOW, &tty_opts_backup);
 	return c;
 }
@@ -37,7 +48,7 @@ char get_one_char(void)
  */
 int get_log(int mode)
 {
-	char read_buf[256], msg[256], c;
+	char read_buf[256], msg[256], c, k;
 	int num_bytes, rcode = 0;
 
 	num_bytes = read(serial_port, &read_buf[0], sizeof(read_buf));
@@ -68,9 +79,24 @@ int get_log(int mode)
 				write(file_port, &read_buf[0], num_bytes);
 			}
 			c = get_one_char();
-			if (c == 'V' || c == 'v') {// check for AC charger commands
+			if (c == 'V' || c == 'v' || c == '#') {// check for valid commands
+
+				switch (c) {
+				case 'V':
+					k = 1;
+					break;
+				case 'v':
+					k = 2;
+					break;
+				case '#':
+					k = 3;
+					break;
+				default:
+					k = 0;
+					break;
+				}
 				write(serial_port, &c, 1);
-				printf("\r\nSend Command %c\r\n", c);
+				printf("\r\nSend Command %c %s\r\n", c, cmd_text[(int) k]);
 			}
 		}
 

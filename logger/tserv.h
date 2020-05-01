@@ -33,6 +33,7 @@ extern "C" {
 
 	int get_log(int);
 	char get_one_char(void);
+	void reset_input_mode(void);
 #ifdef __cplusplus
 }
 #endif
