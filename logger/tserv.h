@@ -32,6 +32,7 @@ extern "C" {
 #define LOG_FILE "/media/disk/minicom1.txt"
 
 	int get_log(int);
+	char get_one_char(void);
 #ifdef __cplusplus
 }
 #endif
