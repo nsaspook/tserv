@@ -75,6 +75,7 @@ int get_log(int mode)
 
 				printf("Send time %s\r\n", msg);
 				rcode = 1;
+				read_buf[0] = '\0';
 			} else { // just write the serial buffer to the log file
 				write(file_port, &read_buf[0], num_bytes);
 			}
