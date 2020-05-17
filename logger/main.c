@@ -34,9 +34,9 @@ int main(int argc, char** argv)
 	int t_set = false;
 	char junk;
 
-#ifdef __x86_64__ // for PC
+#ifdef __x86_64__ // for PC with REAL hardware serial port
 	serial_port = open("/dev/ttyS0", O_RDWR);
-#else // for RPi
+#else // for RPi with USB converter serial port
 	serial_port = open("/dev/ttyUSB0", O_RDWR);
 #endif
 	if (serial_port < 0) {
