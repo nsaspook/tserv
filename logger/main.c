@@ -16,7 +16,7 @@
 int serial_port, file_port;
 struct termios tty, tty_backup;
 struct termios tty_opts_backup, tty_opts_raw;
-bool raw_set1 = false, raw_set2 = false;
+bool raw_set1 = false, raw_set2 = false, got_time=false;
 
 void reset_input_mode(void)
 {

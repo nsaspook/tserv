@@ -4,7 +4,7 @@
 
 extern int serial_port, file_port;
 extern struct termios tty_opts_backup, tty_opts_raw;
-extern bool raw_set2;
+extern bool raw_set2, got_time;
 
 const char cmd_text[][32] = {
 	" ",
@@ -64,7 +64,8 @@ int get_log(int mode)
 	} else {
 		if (num_bytes) {
 			printf("Read %i bytes. Received message: %c\r\n", num_bytes, read_buf[0]);
-			if (read_buf[0] == 'T') { // process the T server time command
+			if (!got_time && (read_buf[0] == 'T')) { // process the T server time command
+				got_time = true;
 				int k = 0;
 				// Write to serial port
 				sprintf(msg, "T%lut", time(0)); // format UNIX time in ASCII
@@ -75,9 +76,9 @@ int get_log(int mode)
 
 				printf("Send time %s\r\n", msg);
 				rcode = 1;
-				read_buf[0] = '\0';
 			} else { // just write the serial buffer to the log file
 				write(file_port, &read_buf[0], num_bytes);
+				got_time = false;
 			}
 			c = get_one_char();
 			if (c == 'V' || c == 'v' || c == '#') {// check for valid commands
