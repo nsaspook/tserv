@@ -18,8 +18,9 @@ char get_one_char(void)
 	struct termios tty_opts_backup, tty_opts_raw;
 
 	if (!isatty(STDIN_FILENO)) {
-		printf("Error: stdin is not a TTY\n");
-		exit(1);
+//		printf("Error: stdin is not a TTY\n");
+//		exit(1);
+		return '\0'; // return a null char
 	}
 
 	// Back up current TTY settings
